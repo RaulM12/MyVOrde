@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'registro_screen.dart';
+import 'escaner_screen.dart';
 
 void main() {
   runApp(const MyVOrderApp());
@@ -63,10 +64,9 @@ class _PantallaInicioState extends State<PantallaInicio> {
               // Botón simulado para Escanear QR (Requisito del documento)
               ElevatedButton.icon(
                 onPressed: () {
-                  // Navegamos a la pantalla de registro
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegistroScreen()),
+                    MaterialPageRoute(builder: (context) => const EscanerScreen()),
                   );
                 },
                 icon: const Icon(Icons.qr_code_scanner),

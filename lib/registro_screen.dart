@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class RegistroScreen extends StatefulWidget {
-  const RegistroScreen({super.key});
+  // Agregamos una variable para recibir el ID de la mesa
+  final String? mesaId;
+
+  // Actualizamos el constructor
+  const RegistroScreen({super.key, this.mesaId});
 
   @override
   State<RegistroScreen> createState() => _RegistroScreenState();
