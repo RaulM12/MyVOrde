@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'registro_screen.dart';
+import 'menu_screen.dart'; // Ahora vamos directo al menú
 
 class EscanerScreen extends StatefulWidget {
-  const EscanerScreen({super.key});
+  // Recibimos el nombre desde el Login
+  final String nombreUsuario;
+
+  const EscanerScreen({super.key, required this.nombreUsuario});
 
   @override
   State<EscanerScreen> createState() => _EscanerScreenState();
@@ -13,9 +16,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
   final MobileScannerController cameraController = MobileScannerController();
   bool _codigoDetectado = false;
 
-  // Función auxiliar para navegar (usada por el escáner real y el botón de prueba)
-  void _navegarARegistro(String codigo) {
-    if (_codigoDetectado) return; // Si ya detectó uno, no hacer nada
+  // Función para ir al Menú
+  void _irAlMenu(String codigoMesa) {
+    if (_codigoDetectado) return;
 
     setState(() {
       _codigoDetectado = true;
@@ -24,7 +27,10 @@ class _EscanerScreenState extends State<EscanerScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => RegistroScreen(mesaId: codigo),
+        builder: (context) => MenuScreen(
+          nombreUsuario: widget.nombreUsuario, // Pasamos el nombre que traemos del Login
+          mesaId: codigoMesa,
+        ),
       ),
     );
   }
@@ -36,31 +42,27 @@ class _EscanerScreenState extends State<EscanerScreen> {
         title: const Text('Escanea el QR'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.flash_on, color: Colors.white),
+            icon: const Icon(Icons.flash_on),
             onPressed: () => cameraController.toggleTorch(),
           ),
         ],
       ),
       body: Stack(
         children: [
-          // 1. La Cámara Real
           MobileScanner(
             controller: cameraController,
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
               if (barcodes.isNotEmpty) {
                 final String codigo = barcodes.first.rawValue ?? "Desconocido";
-                debugPrint('QR Real detectado: $codigo');
-                _navegarARegistro(codigo);
+                _irAlMenu(codigo);
               }
             },
           ),
-
-          // 2. Un diseño superpuesto para que se vea bonito (opcional)
+          // Cuadro visual de guía
           Center(
             child: Container(
-              width: 250,
-              height: 250,
+              width: 250, height: 250,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.deepOrange, width: 4),
                 borderRadius: BorderRadius.circular(20),
@@ -69,16 +71,11 @@ class _EscanerScreenState extends State<EscanerScreen> {
           ),
         ],
       ),
-
-      // 3. BOTÓN TRUCO PARA EL EMULADOR
+      // Mantenemos el botón de debug para el emulador
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Simulamos que leímos la Mesa #5
-          _navegarARegistro("Mesa-Simulada-05");
-        },
-        label: const Text("Simular Escaneo (Debug)"),
+        onPressed: () => _irAlMenu("Mesa-Simulada-05"),
+        label: const Text("Simular (Debug)"),
         icon: const Icon(Icons.bug_report),
-        backgroundColor: Colors.blue,
       ),
     );
   }
