@@ -4,8 +4,13 @@ import 'menu_screen.dart';
 
 class EscanerScreen extends StatefulWidget {
   final String nombreUsuario;
+  final String nombreRestaurante; // <--- NUEVO CAMPO
 
-  const EscanerScreen({super.key, required this.nombreUsuario});
+  const EscanerScreen({
+    super.key,
+    required this.nombreUsuario,
+    required this.nombreRestaurante // <--- Requerido
+  });
 
   @override
   State<EscanerScreen> createState() => _EscanerScreenState();
@@ -15,11 +20,8 @@ class _EscanerScreenState extends State<EscanerScreen> {
   final MobileScannerController cameraController = MobileScannerController();
   bool _codigoDetectado = false;
 
-  // Función compartida: ya sea por QR o manual, hace lo mismo
   void _irAlMenu(String codigoMesa) {
-    if (_codigoDetectado) return; // Evita dobles navegaciones
-
-    // Si el código está vacío (caso manual), no hacemos nada
+    if (_codigoDetectado) return;
     if (codigoMesa.trim().isEmpty) return;
 
     setState(() {
@@ -32,19 +34,19 @@ class _EscanerScreenState extends State<EscanerScreen> {
         builder: (context) => MenuScreen(
           nombreUsuario: widget.nombreUsuario,
           mesaId: codigoMesa,
+          nombreRestaurante: widget.nombreRestaurante, // <--- Pasamos el dato al menú
         ),
       ),
     );
   }
 
-  // Función para mostrar la ventana de ingreso manual
   void _mostrarIngresoManual() {
     final TextEditingController manualController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ingresar Código de Mesa'),
+        title: Text('Mesa en ${widget.nombreRestaurante}'), // Mostramos el nombre aquí
         content: TextField(
           controller: manualController,
           decoration: const InputDecoration(
@@ -54,13 +56,13 @@ class _EscanerScreenState extends State<EscanerScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // Cerrar ventana
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Cerramos el diálogo primero
-              _irAlMenu(manualController.text); // Navegamos al menú
+              Navigator.pop(context);
+              _irAlMenu(manualController.text);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange),
             child: const Text('Entrar', style: TextStyle(color: Colors.white)),
@@ -74,7 +76,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Escanea o Ingresa Código'),
+        title: Text('Escáner - ${widget.nombreRestaurante}'), // Título dinámico
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
@@ -84,7 +86,6 @@ class _EscanerScreenState extends State<EscanerScreen> {
       ),
       body: Stack(
         children: [
-          // 1. La Cámara de fondo
           MobileScanner(
             controller: cameraController,
             onDetect: (capture) {
@@ -95,49 +96,35 @@ class _EscanerScreenState extends State<EscanerScreen> {
               }
             },
           ),
-
-          // 2. Cuadro visual (Guía)
           Center(
             child: Container(
-              width: 250,
-              height: 250,
+              width: 250, height: 250,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.deepOrange, width: 4),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
-
-          // 3. Botón para ingreso manual (Parte inferior)
           Positioned(
-            bottom: 50,
-            left: 20,
-            right: 20,
+            bottom: 50, left: 20, right: 20,
             child: Column(
               children: [
                 const Text(
                   "¿Problemas con el código?",
-                  style: TextStyle(color: Colors.white, shadows: [
-                    Shadow(blurRadius: 10, color: Colors.black, offset: Offset(1, 1))
-                  ]),
+                  style: TextStyle(color: Colors.white, shadows: [Shadow(blurRadius: 10, color: Colors.black)]),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton.icon(
                   onPressed: _mostrarIngresoManual,
                   icon: const Icon(Icons.keyboard),
                   label: const Text("Ingresar código manualmente"),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
                 ),
               ],
             ),
           ),
         ],
       ),
-      // Mantenemos el botón de debug pequeño en la esquina para ti (el desarrollador)
       floatingActionButton: FloatingActionButton.small(
         onPressed: () => _irAlMenu("Mesa-Simulada-05"),
         child: const Icon(Icons.bug_report),

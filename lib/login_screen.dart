@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'escaner_screen.dart';
+import 'restaurantes_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -51,11 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
       nombre = email.split('@')[0];
     }
 
-    // Navegar al Escáner pasando el nombre del usuario
+    // Navegar a la Selección de Restaurante
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => EscanerScreen(nombreUsuario: nombre),
+        builder: (context) => RestaurantesScreen(nombreUsuario: nombre),
       ),
     );
   }

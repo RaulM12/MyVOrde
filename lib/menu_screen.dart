@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class MenuScreen extends StatefulWidget {
   final String nombreUsuario;
   final String mesaId;
+  final String nombreRestaurante; // <--- NUEVO CAMPO
 
-  const MenuScreen({super.key, required this.nombreUsuario, required this.mesaId});
+  const MenuScreen({
+    super.key,
+    required this.nombreUsuario,
+    required this.mesaId,
+    required this.nombreRestaurante, // <--- Requerido
+  });
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -42,7 +48,8 @@ class _MenuScreenState extends State<MenuScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Menú', style: TextStyle(fontSize: 18)),
+            // Aquí mostramos el nombre del restaurante
+            Text(widget.nombreRestaurante, style: const TextStyle(fontSize: 18)),
             Text(
               'Mesa: ${widget.mesaId} - ${widget.nombreUsuario}',
               style: const TextStyle(fontSize: 12),
